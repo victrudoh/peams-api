@@ -8,7 +8,7 @@ const jwt = require("jsonwebtoken");
 // SIGNUP
 exports.signupService = async (details) => {
   try {
-    const { username, email, password } = details;
+    const { username, email, password, firstname, lastname } = details;
 
     //   check if email exist
     const emailExists = await User.findOne({ email: email });
@@ -24,6 +24,8 @@ exports.signupService = async (details) => {
       username,
       email,
       password: hashedPassword,
+      firstname,
+      lastname,
     });
     await user.save();
     return user;

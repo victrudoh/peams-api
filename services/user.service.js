@@ -1,6 +1,9 @@
 // Models
 const userModel = require("../models/user.model");
 
+// Dependencies
+const bcrypt = require("bcryptjs");
+
 // GET ALL USERS
 exports.getAllUsersService = async () => {
   try {
@@ -41,8 +44,13 @@ exports.addUserService = async (details) => {
       return { error: new Error("Error: User exists") };
     }
 
+    //   Hash password
+    const hashedPassword = await bcrypt.hash(details.password, 12);
+
+    const updatedDetails = { ...details, password: hashedPassword };
+
     // Create user
-    const user = new userModel(details);
+    const user = new userModel(updatedDetails);
     await user.save();
     return user;
   } catch (error) {

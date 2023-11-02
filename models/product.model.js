@@ -42,10 +42,16 @@ const productSchema = new Schema(
       ref: "Category",
       // required: true,
     },
+     categoryName: {
+      type: String,
+    },
     shelfId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Shelf",
       // required: true,
+    },
+     shelfName: {
+      type: String,
     },
   },
   {

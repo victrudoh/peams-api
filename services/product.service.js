@@ -1,14 +1,15 @@
 // Models
 const productModel = require("../models/product.model");
 const userModel = require("../models/user.model");
+const categoryModel = require("../models/category.model");
+const notificationModel = require("../models/notification.model");
+const shelfModel = require("../models/shelf.model");
 
 // utils
 const sendMail = require("../utils/mailer.util");
 
 // templates
 const expiryAlertMail = require("../templates/expiryAlertMail.template");
-const notificationModel = require("../models/notification.model");
-const shelfModel = require("../models/shelf.model");
 
 // ALL PRODUCTS
 exports.allProductsService = async (details) => {
@@ -56,12 +57,25 @@ exports.addProductService = async (details) => {
       return { error: new Error("Error: Product exists") };
     }
 
+    // get shelf and category
+    const category = await categoryModel.findOne({
+      id: details.categoryId,
+    });
+    const shelf = await shelfModel.findOne({
+      id: details.shelfId,
+    });
+
     const expiryDate = new Date(details.expiry_date).getTime(); // Convert expiry_date to timestamp
     const currentTime = new Date(Date.now()).getTime(); // Convert currentDate to timestamp
 
     const timeDifference = expiryDate - currentTime;
     const daysUntilExpiry = Math.round(timeDifference / (24 * 60 * 60 * 1000));
-    const productDetails = { ...details, days_until_expiry: daysUntilExpiry };
+    const productDetails = {
+      ...details,
+      days_until_expiry: daysUntilExpiry,
+      categoryName: category.name,
+      shelfName: shelf.name,
+    };
 
     // create product
     const product = new productModel(productDetails);
