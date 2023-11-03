@@ -48,6 +48,10 @@ exports.findOneProductService = async (details) => {
 
 // ADD PRODUCT
 exports.addProductService = async (details) => {
+  console.log(
+    "🚀 ~ file: product.service.js:51 ~ exports.addProductService= ~ details:",
+    details
+  );
   try {
     //   check if product exist
     const productExists = await productModel.findOne({
@@ -58,12 +62,12 @@ exports.addProductService = async (details) => {
     }
 
     // get shelf and category
-    const category = await categoryModel.findOne({
-      id: details.categoryId,
-    });
-    const shelf = await shelfModel.findOne({
-      id: details.shelfId,
-    });
+    const category = await categoryModel.findById(details.categoryId);
+    console.log(
+      "🚀 ~ file: product.service.js:65 ~ exports.addProductService= ~ category:",
+      category
+    );
+    const shelf = await shelfModel.findById(details.shelfId);
 
     const expiryDate = new Date(details.expiry_date).getTime(); // Convert expiry_date to timestamp
     const currentTime = new Date(Date.now()).getTime(); // Convert currentDate to timestamp
