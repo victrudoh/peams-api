@@ -65,6 +65,8 @@ app.use((req, res, next) => {
 // Function to create admin user if it doesn't exist
 async function createAdminUser() {
   try {
+    const firstname = "admin";
+    const lastname = "admin";
     const username = "admin";
     const email = "admin@admin.com";
     const password = "admin";
@@ -77,6 +79,8 @@ async function createAdminUser() {
 
       // create user
       const user = new User({
+        firstname,
+        lastname,
         username,
         email,
         password: hashedPassword,
