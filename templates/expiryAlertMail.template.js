@@ -355,8 +355,8 @@ ul.social li{
 							<br>
 							<h4>Name:${"    "}${product.name} </h4>
 							<h4>Batch number:	${product.batch_no} </h4>
-							<h4>Quantity:  ${product.quantity} </h4>
-							<h4>Unit:  ${product.unit} </h4>
+							<h4>Quantity:  ${product.quantity} ${product.unit}(s) </h4>
+							<h4>shelf:  ${product.shelfName} </h4>
 							<h4>Days before expiry:  ${product.days_until_expiry} day(s) </h4>
 							<h4>Expires on:  ${product.expiry_date} </h4>
 							<br><br>

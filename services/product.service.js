@@ -96,6 +96,10 @@ exports.addProductService = async (details) => {
 
 // EDIT PRODUCT
 exports.editProductService = async (details, id) => {
+  console.log(
+    "🚀 ~ file: product.service.js:99 ~ exports.editProductService= ~ details:",
+    details
+  );
   try {
     // Check if the product exists
     const product = await productModel.findById(id);
@@ -103,8 +107,28 @@ exports.editProductService = async (details, id) => {
       return { error: new Error("Error: Product does not exist") };
     }
 
+    // get shelf and category
+    const category = await categoryModel.findById(details.categoryId);
+    console.log(
+      "🚀 ~ file: product.service.js:65 ~ exports.addProductService= ~ category:",
+      category
+    );
+    const shelf = await shelfModel.findById(details.shelfId);
+
+    const expiryDate = new Date(details.expiry_date).getTime(); // Convert expiry_date to timestamp
+    const currentTime = new Date(Date.now()).getTime(); // Convert currentDate to timestamp
+
+    const timeDifference = expiryDate - currentTime;
+    const daysUntilExpiry = Math.round(timeDifference / (24 * 60 * 60 * 1000));
+    const productDetails = {
+      ...details,
+      days_until_expiry: daysUntilExpiry,
+      categoryName: category.name,
+      shelfName: shelf.name,
+    };
+
     // Update the product details
-    product.set(details);
+    product.set(productDetails);
     await product.save();
 
     return product;
@@ -157,29 +181,26 @@ exports.checkProductExpiryService = async () => {
       ) {
         // Check if the product's expiry date is within the specified threshold
         redZone.push(product);
+        console.log(
+          "🚀 ~ file: product.service.js:159 ~ exports.checkProductExpiryService= ~ redZone:",
+          redZone
+        );
       }
     });
 
-    const users = await userModel.find();
+    const users = await userModel.find({ role: "admin" });
+    console.log(
+      "🚀 ~ file: product.service.js:192 ~ exports.checkProductExpiryService= ~ users:",
+      users
+    );
     if (!users) {
       return { error: new Error("No users found!") };
     }
 
     if (redZone.length > 0) {
+      // send mails
       users.map((user) => {
         redZone.map(async (item) => {
-          const shelf = await shelfModel.findById(item.shelfId);
-          const newProd = {
-            ...item,
-            shelf: shelf,
-          };
-
-          // Send notification
-          const notification = new notificationModel({
-            product: item,
-          });
-          await notification.save();
-
           // Send alert to email
           const mailOptions = {
             to: user.email,
@@ -187,8 +208,23 @@ exports.checkProductExpiryService = async () => {
             html: expiryAlertMail(item),
           };
 
-          // sendMail(mailOptions);
+          sendMail(mailOptions);
         });
+      });
+
+      // Generate notifications (seperated it from mail function because of duplicate notifications)
+      redZone.map(async (item) => {
+        const shelf = await shelfModel.findById(item.shelfId);
+        const newProd = {
+          ...item,
+          shelf: shelf,
+        };
+
+        // create notification
+        const notification = new notificationModel({
+          product: newProd,
+        });
+        await notification.save();
       });
     }
 
