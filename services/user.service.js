@@ -68,8 +68,17 @@ exports.editUserService = async (details, id) => {
     }
 
     // Edit user
-    user.email = details.email; // Replace with the specific field you want to update
-    // Update other fields as needed
+    //   Hash password
+    let hashedPassword;
+    if (details.password) {
+      hashedPassword = await bcrypt.hash(details.password, 12);
+    } else {
+      hashedPassword = user.password;
+    }
+
+    const updatedDetails = { ...details, password: hashedPassword };
+
+    user.set(updatedDetails);
     await user.save();
     return user;
   } catch (error) {
