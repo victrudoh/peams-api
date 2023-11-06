@@ -176,8 +176,8 @@ exports.checkProductExpiryService = async () => {
       product.save();
 
       if (
-        daysUntilExpiry <= product.expiry_threshhold &&
-        daysUntilExpiry >= 0
+        daysUntilExpiry <= product.expiry_threshhold
+        // && daysUntilExpiry >= 0
       ) {
         // Check if the product's expiry date is within the specified threshold
         redZone.push(product);
